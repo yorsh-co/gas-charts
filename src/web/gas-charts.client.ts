@@ -1,68 +1,82 @@
 /**
  * Browser helper shipped after ECharts. Exposes `window.GasCharts` with
- * `render` and `dispose`. An existing `window.GasCharts` is preserved.
+ * `render` and `dispose`. An existing `window.GasCharts` is preserved only when
+ * it already has a `render` function, so named-element globals (`id="GasCharts"`)
+ * do not shadow the helper.
+ *
+ * A string target is resolved with `document.querySelector`; an invalid CSS
+ * selector makes `render` and `dispose` throw the browser's `SyntaxError`.
+ * Without `ResizeObserver`, `render` skips auto-resize instead of throwing.
  */
 window.GasCharts =
-  window.GasCharts ||
-  (function (): GasChartsClient {
-    const prefix = '[GasCharts]';
-    const observers = new WeakMap<HTMLElement, ResizeObserver>();
+  window.GasCharts && typeof window.GasCharts.render === 'function'
+    ? window.GasCharts
+    : (function (): GasChartsClient {
+        const prefix = '[GasCharts]';
+        const observers = new WeakMap<HTMLElement, ResizeObserver>();
 
-    function find(target: HTMLElement | string): HTMLElement | null {
-      const element =
-        typeof target === 'string' ? document.querySelector(target) : target;
-      return (element as HTMLElement | null) || null;
-    }
-
-    function resolve(target: HTMLElement | string): HTMLElement {
-      const element = find(target);
-      if (!element) {
-        throw new Error(prefix + ' target not found: ' + String(target));
-      }
-      return element;
-    }
-
-    function stopObserving(element: HTMLElement): void {
-      const observer = observers.get(element);
-      if (observer) {
-        observer.disconnect();
-        observers.delete(element);
-      }
-    }
-
-    return {
-      render(target, option, options) {
-        if (typeof echarts === 'undefined') {
-          throw new Error(prefix + ' echarts is not loaded');
+        function find(target: HTMLElement | string): HTMLElement | null {
+          const element =
+            typeof target === 'string'
+              ? document.querySelector(target)
+              : target;
+          return (element as HTMLElement | null) || null;
         }
-        const element = resolve(target);
-        const settings = options || {};
-        const chart =
-          echarts.getInstanceByDom(element) ||
-          echarts.init(element, settings.theme, {
-            renderer: settings.renderer,
-          });
-        chart.setOption(option, settings.notMerge);
-        if (settings.autoResize === false) {
-          stopObserving(element);
-        } else if (!observers.has(element)) {
-          const observer = new ResizeObserver(function () {
-            const current = echarts && echarts.getInstanceByDom(element);
-            if (current) current.resize();
-          });
-          observer.observe(element);
-          observers.set(element, observer);
-        }
-        return chart;
-      },
 
-      dispose(target) {
-        const element = find(target);
-        if (!element) return;
-        stopObserving(element);
-        if (typeof echarts === 'undefined') return;
-        const chart = echarts.getInstanceByDom(element);
-        if (chart) chart.dispose();
-      },
-    };
-  })();
+        function resolve(target: HTMLElement | string): HTMLElement {
+          const element = find(target);
+          if (!element) {
+            throw new Error(prefix + ' target not found: ' + String(target));
+          }
+          return element;
+        }
+
+        function stopObserving(element: HTMLElement): void {
+          const observer = observers.get(element);
+          if (observer) {
+            observer.disconnect();
+            observers.delete(element);
+          }
+        }
+
+        return {
+          render(target, option, options) {
+            if (typeof echarts === 'undefined') {
+              throw new Error(prefix + ' echarts is not loaded');
+            }
+            const element = resolve(target);
+            const settings = options || {};
+            const chart =
+              echarts.getInstanceByDom(element) ||
+              echarts.init(element, settings.theme, {
+                renderer: settings.renderer,
+              });
+            chart.setOption(option, settings.notMerge);
+            if (settings.autoResize === false) {
+              stopObserving(element);
+            } else if (
+              typeof ResizeObserver !== 'undefined' &&
+              !observers.has(element)
+            ) {
+              const observer = new ResizeObserver(function () {
+                const current =
+                  typeof echarts !== 'undefined' &&
+                  echarts.getInstanceByDom(element);
+                if (current) current.resize();
+              });
+              observer.observe(element);
+              observers.set(element, observer);
+            }
+            return chart;
+          },
+
+          dispose(target) {
+            const element = find(target);
+            if (!element) return;
+            stopObserving(element);
+            if (typeof echarts === 'undefined') return;
+            const chart = echarts.getInstanceByDom(element);
+            if (chart) chart.dispose();
+          },
+        };
+      })();

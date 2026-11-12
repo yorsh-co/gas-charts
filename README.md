@@ -56,8 +56,8 @@ const chart = GasCharts.render('#chart', {
 GasCharts.dispose('#chart');
 ```
 
-- `GasCharts.render(target, option, options?)`: `target` is an element or a selector. Reuses the chart already attached to the element, otherwise creates one, then applies `option`. Returns the ECharts instance. Throws `Error` if the target is not found or `echarts` is not loaded.
-- `GasCharts.dispose(target)`: stops resizing and disposes the chart. No-op when there is no chart or the selector matches nothing.
+- `GasCharts.render(target, option, options?)`: `target` is an element or a selector. Reuses the chart already attached to the element, otherwise creates one, then applies `option`. Returns the ECharts instance. Throws `Error` if the target is not found or `echarts` is not loaded, and the browser's `SyntaxError` if a string target is an invalid CSS selector. Auto-resize is skipped when `ResizeObserver` is unavailable.
+- `GasCharts.dispose(target)`: stops resizing and disposes the chart. No-op when there is no chart or a valid selector matches nothing; an invalid CSS selector throws the browser's `SyntaxError` from `querySelector`.
 
 | Option       | Default  | Description                                                   |
 | ------------ | -------- | ------------------------------------------------------------- |

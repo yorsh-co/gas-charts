@@ -5,8 +5,14 @@ import { loadGasCharts } from './harness';
 
 describe('window.GasCharts client', () => {
   it('preserves an existing window.GasCharts', () => {
-    const existing = { marker: true };
+    const existing = { render() {}, dispose() {} };
     expect(loadClient(existing).window.GasCharts).toBe(existing);
+  });
+
+  it('replaces a non-helper window.GasCharts such as a named element', () => {
+    const { window } = loadClient({ id: 'GasCharts' });
+    expect(typeof window.GasCharts.render).toBe('function');
+    expect(typeof window.GasCharts.dispose).toBe('function');
   });
 
   it('exposes render and dispose', () => {
@@ -106,6 +112,19 @@ describe('window.GasCharts client', () => {
       sandbox.window.GasCharts.render('#chart', {});
       sandbox.window.GasCharts.render('#chart', {}, { autoResize: false });
       expect(sandbox.observers[0]!.disconnected).toBe(true);
+    });
+
+    it('does not throw in the observer callback when echarts is deleted', () => {
+      const sandbox = loadClient();
+      sandbox.window.GasCharts.render('#chart', {});
+      sandbox.removeEcharts();
+      expect(() => sandbox.observers[0]!.callback()).not.toThrow();
+    });
+
+    it('skips auto-resize when ResizeObserver is unavailable', () => {
+      const sandbox = loadClient(undefined, false);
+      expect(() => sandbox.window.GasCharts.render('#chart', {})).not.toThrow();
+      expect(sandbox.observers).toHaveLength(0);
     });
 
     it('does not observe when autoResize is false', () => {

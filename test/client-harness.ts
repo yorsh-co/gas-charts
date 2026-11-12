@@ -47,8 +47,12 @@ export interface ClientSandbox {
  * Runs the generated client in a fresh `node:vm` context with a fake `echarts`,
  * `document` and `ResizeObserver`.
  * @param preset Optional existing `window.GasCharts` value.
+ * @param withObserver Set to `false` to omit `ResizeObserver` from the context.
  */
-export function loadClient(preset?: unknown): ClientSandbox {
+export function loadClient(
+  preset?: unknown,
+  withObserver = true,
+): ClientSandbox {
   const source = loadGasCharts().exports._GAS_CHARTS_CLIENT_JS;
   const elements: Record<string, object> = { '#chart': {} };
   const charts = new Map<object, FakeChart>();
@@ -93,6 +97,7 @@ export function loadClient(preset?: unknown): ClientSandbox {
       getInstanceByDom: (element: object) => charts.get(element),
     },
   };
+  if (!withObserver) delete context['ResizeObserver'];
   vm.runInNewContext(source, context);
   return {
     window: window as ClientSandbox['window'],
