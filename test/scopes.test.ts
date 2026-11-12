@@ -72,6 +72,11 @@ function identifiers(source: string): Set<string> {
   return names;
 }
 
+/** Whole-word occurrences of `name` in raw text, comments and strings included. */
+function mentions(source: string, name: string): boolean {
+  return new RegExp(`\\b${name}\\b`).test(source);
+}
+
 describe('OAuth scopes', () => {
   const files = shippedSources();
   const referenced = files.map((file) => ({
@@ -94,6 +99,17 @@ describe('OAuth scopes', () => {
 
     expect(offenders).toEqual([]);
   });
+
+  it.each(FORBIDDEN)(
+    'never mentions %s anywhere in the shipped source text',
+    (name) => {
+      const offenders = files
+        .filter((file) => mentions(readFileSync(file, 'utf8'), name))
+        .map((file) => relative(ROOT, file));
+
+      expect(offenders).toEqual([]);
+    },
+  );
 
   it('catches a reference in code but ignores comments', () => {
     expect(

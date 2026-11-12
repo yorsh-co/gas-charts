@@ -28,6 +28,18 @@ describe('GasCharts.inject', () => {
     );
   });
 
+  it('puts the tag before </head> after a doctype', () => {
+    expect(GasCharts.inject('<!doctype html><head></head>')).toBe(
+      `<!doctype html><head>${tag}</head>`,
+    );
+  });
+
+  it('replaces the marker after a doctype', () => {
+    expect(GasCharts.inject(`<!doctype html>${GAS_CHARTS_MARKER}`)).toBe(
+      `<!doctype html>${tag}`,
+    );
+  });
+
   it.each(['<!DOCTYPE html>', '<!doctype html>', '\uFEFF \n<!DocType html>'])(
     'inserts after the doctype %j when there is no marker or head',
     (doctype) => {
@@ -61,8 +73,8 @@ describe('GasCharts.inject', () => {
   });
 
   it.each([undefined, null, 5, {}])('throws on non-string %j', (value) => {
-    expect(() => GasCharts.inject(value as unknown as string)).toThrow(
-      TypeError,
-    );
+    const call = () => GasCharts.inject(value as unknown as string);
+    expect(call).toThrow(TypeError);
+    expect(call).toThrow(/^\[GasCharts\] html must be a string/);
   });
 });

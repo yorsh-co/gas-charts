@@ -34,8 +34,9 @@ const GasCharts = Object.freeze({
    * first `<!-- gas-charts -->` marker; without a marker it goes immediately
    * before the first `</head>` (case-insensitive); failing that it goes
    * right after a leading `<!doctype ...>` declaration (case-insensitive,
-   * optional leading whitespace or BOM); otherwise it is prepended. The search is raw text, not parsed HTML: the
-   * first textual occurrence wins, even inside an earlier comment or inline script string.
+   * optional leading whitespace or BOM); otherwise it is prepended. The
+   * search is raw text, not parsed HTML: the first textual occurrence wins,
+   * even inside an earlier comment or inline script string.
    * @param html The page to inject into.
    * @param options Optional tag settings.
    * @returns The page with ECharts inlined.
