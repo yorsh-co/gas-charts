@@ -28,9 +28,15 @@
     ],
     "release": {
       "githubRelease": true
+    },
+    "gasTest": {
+      "scopes": [
+        "https://www.googleapis.com/auth/script.storage"
+      ]
     }
   },
   "devDependencies": {
+    "@google/clasp": "^3.4.1",
     "@types/google-apps-script": "^2.0.13",
     "@types/node": "^22.20.5",
     "echarts": "6.1.0",
@@ -58,7 +64,10 @@
     "test:watch": "vitest",
     "build": "npm run clean && npm run generate && tsc",
     "build:watch": "tsc --watch",
-    "typecheck": "npm run generate:check && tsc --noEmit && tsc -p tsconfig.frontend.json && tsc -p tsconfig.test.json && tsc -p tsconfig.peer.json && echo '✓ TypeScript passed'"
+    "typecheck": "npm run generate:check && tsc --noEmit && tsc -p tsconfig.frontend.json && tsc -p tsconfig.test.json && tsc -p tsconfig.peer.json && tsc -p gas-test/tsconfig.json --noEmit && echo '✓ TypeScript passed'",
+    "test:gas:build": "gasdev gas-test build",
+    "test:gas": "gasdev gas-test run",
+    "manual:build": "npm run build && node scripts/build-manual-charts.js"
   },
   "overrides": {
     "minimatch": "^11.0.1",

@@ -105,6 +105,8 @@ Add the library to your project's `package.json` and bundle it with `gasdev bund
 
 - `npm run generate` regenerates `src/generated/` from `node_modules/echarts`.
 - To upgrade ECharts, bump the pinned `echarts` devDependency, run `npm install` and `npm run generate`, then commit the result. `generate:check` fails until you do.
+- Manual verification: `npm run manual:build` assembles a fixture web app for the live checks in [`manual/README.md`](manual/README.md). Set `MANUAL_CHARTS_SCRIPT_ID` first.
+- `npm run test:gas` runs the tests in `gas-test/` in a real Apps Script project (needs clasp credentials).
 - `npm run check` runs formatting, lint, type checks, tests and `gasdev check`.
 
 ## Peer Type Declarations
