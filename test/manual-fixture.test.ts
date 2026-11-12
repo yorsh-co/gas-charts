@@ -85,7 +85,12 @@ describe('manual fixture build', () => {
     expect(html).not.toContain('<!-- gas-charts -->');
     expect(html.split('<script>')).toHaveLength(3);
     expect(html.indexOf('<script>')).toBeLessThan(html.indexOf('</head>'));
-    expect(html.slice(html.indexOf('<script>'))).toContain('echarts.version');
+    expect(html.lastIndexOf('<script>')).toBeGreaterThan(
+      html.indexOf('</head>'),
+    );
+    expect(html.indexOf('echarts.version')).toBeGreaterThan(
+      html.indexOf('</head>'),
+    );
     expect(html).toContain("GasCharts.render('#bar'");
     expect(html).toContain("GasCharts.render('#pie'");
   });

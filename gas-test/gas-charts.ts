@@ -17,4 +17,12 @@ test('HtmlService serves the injected page', () => {
     GasCharts.inject('<html><head></head><body></body></html>'),
   ).getContent();
   assert(content.includes('echarts'), 'the served page should contain echarts');
+  assert(
+    content.includes(GasCharts.ECHARTS_VERSION),
+    'the served page should include the ECharts version',
+  );
+  assert(
+    content.length > 500000,
+    'the served page should carry the full ECharts build',
+  );
 });
