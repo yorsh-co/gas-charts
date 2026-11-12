@@ -1,6 +1,6 @@
 {
   "name": "gas-charts",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Apache ECharts for Google Apps Script web apps, served inline with no CDN.",
   "repository": {
