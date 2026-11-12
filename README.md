@@ -310,7 +310,9 @@ GasCharts.inject(html, { client: false });
 
 ### Errors
 
-- `scriptTag` and `inject` throw `TypeError` for an invalid `nonce`, a non-string `html` or a non-boolean `client`.
+- `script`, `scriptTag` and `inject` throw `TypeError` for a non-boolean `client`.
+- `scriptTag` and `inject` throw `TypeError` for an invalid `nonce`.
+- `inject` throws `TypeError` for a non-string `html`.
 - `render` throws `Error` if the target is not found or `echarts` is not loaded.
 - `render` and `dispose` throw the browser's `SyntaxError` from `querySelector` if a string target is an invalid CSS selector.
 
@@ -330,7 +332,7 @@ Main entry point for the library. Singleton namespace, not a class — there is 
 
 ```js
 GasCharts.ECHARTS_VERSION; // vendored ECharts version
-GasCharts.script(options); // options is optional; { nonce?, client? } → ECharts source (plus browser helper), safe inside an inline <script>
+GasCharts.script(options); // options is optional; { client? } → ECharts source (plus browser helper), safe inside an inline <script>
 GasCharts.scriptTag(options); // options is optional; { nonce?, client? } → a complete <script> element
 GasCharts.inject(html, options); // options is optional; { nonce?, client? } → html with the tag inserted
 ```
@@ -360,7 +362,7 @@ function doGet() {
 <body>
   <div id="chart" style="width: 600px; height: 400px"></div>
   <script>
-    const data = <?!= JSON.stringify(data) ?>;
+    const data = <?!= JSON.stringify(data).replace(/</g, '\\u003c') ?>;
 
     GasCharts.render('#chart', {
       xAxis: { type: 'category', data: data.map((_, i) => `Item ${i + 1}`) },
@@ -370,6 +372,8 @@ function doGet() {
   </script>
 </body>
 ```
+
+The `replace` escapes `<` so a `</script>` inside a string value cannot end the inline script early.
 
 ### Peer Type Declarations
 
