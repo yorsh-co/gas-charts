@@ -21,7 +21,9 @@
   "gasdev": {
     "loadOrder": [
       "gas-charts.constants.ts",
-      "generated/gas-charts.echarts.ts"
+      "generated/gas-charts.echarts.ts",
+      "types/gas-charts.types.ts",
+      "gas-charts.main.ts"
     ],
     "release": {
       "githubRelease": true
@@ -55,7 +57,7 @@
     "test:watch": "vitest",
     "build": "npm run clean && npm run generate && tsc",
     "build:watch": "tsc --watch",
-    "typecheck": "npm run generate:check && tsc --noEmit && tsc -p tsconfig.test.json && echo '✓ TypeScript passed'"
+    "typecheck": "npm run generate:check && tsc --noEmit && tsc -p tsconfig.test.json && tsc -p tsconfig.peer.json && echo '✓ TypeScript passed'"
   },
   "overrides": {
     "minimatch": "^11.0.1",

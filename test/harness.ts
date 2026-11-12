@@ -7,6 +7,12 @@ export interface GasChartsExports {
   GAS_CHARTS_MARKER: string;
   _GAS_CHARTS_ECHARTS_JS: string;
   GAS_CHARTS_ECHARTS_VERSION: string;
+  GasCharts: {
+    ECHARTS_VERSION: string;
+    script(): string;
+    scriptTag(options?: { nonce?: string }): string;
+    inject(html: string, options?: { nonce?: string }): string;
+  };
 }
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -18,6 +24,7 @@ const load = createGasLoader<GasChartsExports>({
     'GAS_CHARTS_MARKER',
     '_GAS_CHARTS_ECHARTS_JS',
     'GAS_CHARTS_ECHARTS_VERSION',
+    'GasCharts',
   ],
   root: ROOT,
 });
