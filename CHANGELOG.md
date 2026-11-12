@@ -10,3 +10,4 @@
 - `generate` and `generate:check` scripts to regenerate and verify the vendored constant.
 - `GasCharts` server API: `ECHARTS_VERSION`, `script`, `scriptTag` and `inject` (marker, `</head>`, doctype or prepend), with optional CSP `nonce`.
 - Peer type declarations and usage docs.
+- Browser helper `window.GasCharts` (`render`, `dispose`, auto-resize) shipped after ECharts, with a `client: false` opt-out.

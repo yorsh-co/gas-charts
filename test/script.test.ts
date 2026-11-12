@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { loadGasCharts } from './harness';
 
 describe('GasCharts.script / scriptTag', () => {
-  const { GasCharts, _GAS_CHARTS_ECHARTS_JS } = loadGasCharts().exports;
+  const { GasCharts, _GAS_CHARTS_ECHARTS_JS, _GAS_CHARTS_CLIENT_JS } =
+    loadGasCharts().exports;
 
   it('exposes the pinned ECharts version', () => {
     expect(GasCharts.ECHARTS_VERSION).toBe('6.1.0');
@@ -12,8 +13,31 @@ describe('GasCharts.script / scriptTag', () => {
     expect(Object.isFrozen(GasCharts)).toBe(true);
   });
 
-  it('returns the vendored source from script()', () => {
-    expect(GasCharts.script()).toBe(_GAS_CHARTS_ECHARTS_JS);
+  it('returns ECharts followed by the client from script()', () => {
+    expect(GasCharts.script()).toBe(
+      _GAS_CHARTS_ECHARTS_JS + '\n;' + _GAS_CHARTS_CLIENT_JS,
+    );
+  });
+
+  it('omits the client with client: false', () => {
+    expect(GasCharts.script({ client: false })).toBe(_GAS_CHARTS_ECHARTS_JS);
+    expect(GasCharts.scriptTag({ client: false })).toBe(
+      '<script>' + _GAS_CHARTS_ECHARTS_JS + '</script>',
+    );
+    expect(GasCharts.inject('<head></head>', { client: false })).not.toContain(
+      'window.GasCharts',
+    );
+  });
+
+  it.each(['no', 0, null])('rejects non-boolean client %j', (client) => {
+    const call = () =>
+      GasCharts.script({ client: client as unknown as boolean });
+    expect(call).toThrow(TypeError);
+    expect(call).toThrow('[GasCharts] options.client must be a boolean');
+  });
+
+  it('keeps the client when client is true or omitted', () => {
+    expect(GasCharts.script({ client: true })).toBe(GasCharts.script());
   });
 
   it('wraps the source in a bare script tag', () => {

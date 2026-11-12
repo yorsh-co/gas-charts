@@ -56,11 +56,23 @@ describe('toModule', () => {
 });
 
 describe('generate', () => {
-  it('emits exactly the ECharts module', () => {
+  it('emits exactly the ECharts and client modules', () => {
     const paths = (generate(ROOT) as { path: string }[]).map(({ path }) =>
       relative(ROOT, path),
     );
-    expect(paths).toEqual(['src/generated/gas-charts.echarts.ts']);
+    expect(paths).toEqual([
+      'src/generated/gas-charts.echarts.ts',
+      'src/generated/gas-charts.client.ts',
+    ]);
+  });
+
+  it('transpiles the client to plain script JS', () => {
+    const client = (generate(ROOT) as { path: string; content: string }[]).find(
+      ({ path }) => path.endsWith('gas-charts.client.ts'),
+    )!.content;
+    expect(client).toContain('_GAS_CHARTS_CLIENT_JS');
+    expect(client).not.toMatch(/\bexport\b|\bimport\b/);
+    expect(client).not.toContain('GasChartsClient');
   });
 
   it('passes `generate.js --check`', () => {

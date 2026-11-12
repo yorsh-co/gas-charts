@@ -11,6 +11,7 @@
 
 - Serves the full Apache ECharts build from inside your Apps Script project: no CDN, no external request.
 - `GasCharts.inject(html)` for `createHtmlOutput`, `GasCharts.scriptTag()` for templates.
+- Browser helper `window.GasCharts.render(el, option)` with auto-resize and `dispose`.
 - Optional CSP `nonce` on the script tag.
 - Zero OAuth scopes: the library only returns strings.
 
@@ -41,6 +42,32 @@ In a page with a marker, the first `<!-- gas-charts -->` is replaced by the scri
 </head>
 ```
 
+## Browser helper
+
+Unless you pass `client: false`, the injected script also defines `window.GasCharts` after ECharts:
+
+```js
+const chart = GasCharts.render('#chart', {
+  xAxis: { type: 'category', data: ['A', 'B'] },
+  yAxis: {},
+  series: [{ type: 'bar', data: [1, 2] }],
+});
+
+GasCharts.dispose('#chart');
+```
+
+- `GasCharts.render(target, option, options?)`: `target` is an element or a selector. Reuses the chart already attached to the element, otherwise creates one, then applies `option`. Returns the ECharts instance. Throws `Error` if the target is not found or `echarts` is not loaded, and the browser's `SyntaxError` if a string target is an invalid CSS selector. Auto-resize is skipped when `ResizeObserver` is unavailable.
+- `GasCharts.dispose(target)`: stops resizing and disposes the chart. No-op when there is no chart or a valid selector matches nothing; an invalid CSS selector throws the browser's `SyntaxError` from `querySelector`.
+
+| Option       | Default  | Description                                                   |
+| ------------ | -------- | ------------------------------------------------------------- |
+| `theme`      | none     | ECharts theme name or object, used when the chart is created. |
+| `renderer`   | `canvas` | `canvas` or `svg`, used when the chart is created.            |
+| `notMerge`   | `false`  | Replace the previous option instead of merging.               |
+| `autoResize` | `true`   | Resize the chart with its container via `ResizeObserver`.     |
+
+To ship ECharts alone, pass `{ client: false }` to `script`, `scriptTag` or `inject`.
+
 ## Requirements
 
 - No OAuth scopes.
@@ -62,12 +89,12 @@ Add the library to your project's `package.json` and bundle it with `gasdev bund
 
 ## API
 
-| Member                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ECHARTS_VERSION`        | Version of the vendored ECharts build.                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `script()`               | ECharts source, safe inside an inline `<script>`.                                                                                                                                                                                                                                                                                                                                                                                         |
-| `scriptTag(options?)`    | A complete `<script>` element. `options.nonce` sets the `nonce` attribute (`[A-Za-z0-9+/_=-]+`); otherwise throws `TypeError`.                                                                                                                                                                                                                                                                                                            |
-| `inject(html, options?)` | Inserts the tag at the first `<!-- gas-charts -->` marker, else before the first `</head>` (case-insensitive), else right after a leading `<!doctype ...>` (case-insensitive), else at the start. First textual occurrence wins (raw text search, not parsed; a match inside an earlier comment or inline script string counts). `options` are as for `scriptTag`. Throws `TypeError` if `html` is not a string or `options` are invalid. |
+| Member                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ECHARTS_VERSION`        | Version of the vendored ECharts build.                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `script(options?)`       | ECharts source plus the browser helper (unless `options.client` is `false`), safe inside an inline `<script>`.                                                                                                                                                                                                                                                                                                                                                               |
+| `scriptTag(options?)`    | A complete `<script>` element. `options.nonce` sets the `nonce` attribute (`[A-Za-z0-9+/_=-]+`); otherwise throws `TypeError`. `options.client: false` omits the browser helper.                                                                                                                                                                                                                                                                                             |
+| `inject(html, options?)` | Inserts the tag at the first `<!-- gas-charts -->` marker, else before the first `</head>` (case-insensitive), else right after a leading `<!doctype ...>` (case-insensitive), else at the start. First textual occurrence wins (raw text search, not parsed; a match inside an earlier comment or inline script string counts). `options` are as for `scriptTag`. Throws `TypeError` if `html` is not a string or `options` are invalid (including a non-boolean `client`). |
 
 ## Platform notes
 

@@ -7,11 +7,15 @@ export interface GasChartsExports {
   GAS_CHARTS_MARKER: string;
   _GAS_CHARTS_ECHARTS_JS: string;
   GAS_CHARTS_ECHARTS_VERSION: string;
+  _GAS_CHARTS_CLIENT_JS: string;
   GasCharts: {
     ECHARTS_VERSION: string;
-    script(): string;
-    scriptTag(options?: { nonce?: string }): string;
-    inject(html: string, options?: { nonce?: string }): string;
+    script(options?: { client?: boolean }): string;
+    scriptTag(options?: { nonce?: string; client?: boolean }): string;
+    inject(
+      html: string,
+      options?: { nonce?: string; client?: boolean },
+    ): string;
   };
 }
 
@@ -24,6 +28,7 @@ const load = createGasLoader<GasChartsExports>({
     'GAS_CHARTS_MARKER',
     '_GAS_CHARTS_ECHARTS_JS',
     'GAS_CHARTS_ECHARTS_VERSION',
+    '_GAS_CHARTS_CLIENT_JS',
     'GasCharts',
   ],
   root: ROOT,
