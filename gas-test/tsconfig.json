@@ -1,0 +1,5 @@
+{
+  "extends": "gasdev/tsconfig/gas-test.json",
+  "include": ["../src/**/*.ts", "*.ts"],
+  "exclude": ["../src/web/**/*"]
+}
