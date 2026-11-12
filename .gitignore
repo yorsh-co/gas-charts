@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.worktrees/
+.claude/worktrees/
+.claude/plans/
+.claude/handoff/
+.env
+.manual-charts/

@@ -1,0 +1,79 @@
+/**
+ * Ambient declarations for gas-charts, consumed as a peer package.
+ *
+ * gas-charts is expected as a runtime global (Apps Script has no module
+ * system); this file declares its public surface so a consuming package can
+ * typecheck standalone via `tsc --noEmit` without vendoring the source.
+ *
+ * Canonical copy: gas-charts/peer/gas-charts.peer.types.d.ts. Do not edit
+ * downstream copies; update the canonical file and re-copy.
+ *
+ * Usage: list `gas-charts` in `gasdev.peers` and run `gasdev peers sync`.
+ *
+ * @see https://github.com/yorsh-co/gas-charts
+ * @version 0.1.0
+ */
+
+/** Options for `GasCharts.script`, `GasCharts.scriptTag` and `GasCharts.inject`. */
+interface GasChartsScriptOptions {
+  /**
+   * Value of the `nonce` attribute set on the `<script>` tag, for pages that
+   * enforce a Content Security Policy. Limited to base64 and base64url
+   * characters.
+   */
+  nonce?: string;
+
+  /**
+   * Appends the browser helper `window.GasCharts` after ECharts. Defaults to
+   * `true`; set to `false` to ship ECharts alone.
+   */
+  client?: boolean;
+}
+
+/**
+ * Serves Apache ECharts inline so an Apps Script web app can use it with no
+ * CDN request.
+ *
+ * Server usage: `GasCharts.inject(html)` on an HTML string, or
+ * `<?!= GasCharts.scriptTag() ?>` in a template (use `<?!= ?>`, never `<?= ?>`,
+ * which would escape the script).
+ */
+declare const GasCharts: {
+  /** Version of the vendored ECharts build. */
+  readonly ECHARTS_VERSION: string;
+
+  /**
+   * Returns the ECharts source followed by the browser helper, safe to place
+   * inside an inline `<script>`.
+   * @param options Optional settings; `client: false` omits the helper.
+   * @throws {TypeError} If `options.client` is not a boolean.
+   * @returns JavaScript source that defines the global `echarts` and, unless
+   *   disabled, `window.GasCharts`.
+   */
+  script(options?: GasChartsScriptOptions): string;
+
+  /**
+   * Returns a complete `<script>` element carrying ECharts and the helper.
+   * @param options Optional tag settings.
+   * @returns The `<script>...</script>` markup.
+   * @throws {TypeError} If `options.nonce` is not a string or contains invalid
+   *   characters, or `options.client` is not a boolean.
+   */
+  scriptTag(options?: GasChartsScriptOptions): string;
+
+  /**
+   * Inserts the ECharts script tag into an HTML page. The tag replaces the
+   * first `<!-- gas-charts -->` marker; without a marker it goes immediately
+   * before the first `</head>` (case-insensitive); failing that it goes
+   * right after a leading `<!doctype ...>` declaration (case-insensitive,
+   * optional leading whitespace or BOM); otherwise it is prepended. The
+   * search is raw text, not parsed HTML: the first textual occurrence wins,
+   * even inside an earlier comment or inline script string.
+   * @param html The page to inject into.
+   * @param options Optional tag settings.
+   * @returns The page with ECharts inlined.
+   * @throws {TypeError} If `html` is not a string or `options.nonce` or
+   *   `options.client` is invalid.
+   */
+  inject(html: string, options?: GasChartsScriptOptions): string;
+};
