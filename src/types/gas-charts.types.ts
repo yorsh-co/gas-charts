@@ -1,4 +1,4 @@
-/** Options for `GasCharts.scriptTag` and `GasCharts.inject`. */
+/** Options for `GasCharts.script`, `GasCharts.scriptTag` and `GasCharts.inject`. */
 interface GasChartsScriptOptions {
   /**
    * Value of the `nonce` attribute set on the `<script>` tag, for pages that
@@ -6,4 +6,10 @@ interface GasChartsScriptOptions {
    * characters.
    */
   nonce?: string;
+
+  /**
+   * Appends the browser helper `window.GasCharts` after ECharts. Defaults to
+   * `true`; set to `false` to ship ECharts alone.
+   */
+  client?: boolean;
 }

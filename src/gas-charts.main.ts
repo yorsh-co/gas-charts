@@ -11,19 +11,23 @@ const GasCharts = Object.freeze({
   ECHARTS_VERSION: GAS_CHARTS_ECHARTS_VERSION,
 
   /**
-   * Returns the ECharts source, safe to place inside an inline `<script>`.
-   * @returns JavaScript source that defines the global `echarts`.
+   * Returns the ECharts source followed by the browser helper, safe to place
+   * inside an inline `<script>`.
+   * @param options Optional settings; `client: false` omits the helper.
+   * @throws {TypeError} If `options.client` is not a boolean.
+   * @returns JavaScript source that defines the global `echarts` and, unless
+   *   disabled, `window.GasCharts`.
    */
-  script(): string {
-    return _GAS_CHARTS_ECHARTS_JS;
+  script(options?: GasChartsScriptOptions): string {
+    return _gasChartsScript(options);
   },
 
   /**
-   * Returns a complete `<script>` element carrying ECharts.
+   * Returns a complete `<script>` element carrying ECharts and the helper.
    * @param options Optional tag settings.
    * @returns The `<script>...</script>` markup.
    * @throws {TypeError} If `options.nonce` is not a string or contains invalid
-   *   characters.
+   *   characters, or `options.client` is not a boolean.
    */
   scriptTag(options?: GasChartsScriptOptions): string {
     return _gasChartsScriptTag(options);
@@ -40,7 +44,8 @@ const GasCharts = Object.freeze({
    * @param html The page to inject into.
    * @param options Optional tag settings.
    * @returns The page with ECharts inlined.
-   * @throws {TypeError} If `html` is not a string or `options.nonce` is invalid.
+   * @throws {TypeError} If `html` is not a string or `options.nonce` or
+   *   `options.client` is invalid.
    */
   inject(html: string, options?: GasChartsScriptOptions): string {
     if (typeof html !== 'string') {
@@ -93,5 +98,21 @@ function _gasChartsScriptTag(options?: GasChartsScriptOptions): string {
     }
     attributes = ' nonce="' + nonce + '"';
   }
-  return '<script' + attributes + '>' + _GAS_CHARTS_ECHARTS_JS + '</script>';
+  return '<script' + attributes + '>' + _gasChartsScript(options) + '</script>';
+}
+
+/**
+ * Concatenates ECharts and, unless disabled, the browser helper.
+ * @param options Optional settings.
+ * @returns The JavaScript source.
+ */
+function _gasChartsScript(options?: GasChartsScriptOptions): string {
+  const client = options && options.client;
+  if (client !== undefined && typeof client !== 'boolean') {
+    throw new TypeError(
+      GAS_CHARTS_ERROR_PREFIX + ' options.client must be a boolean',
+    );
+  }
+  if (client === false) return _GAS_CHARTS_ECHARTS_JS;
+  return _GAS_CHARTS_ECHARTS_JS + '\n;' + _GAS_CHARTS_CLIENT_JS;
 }

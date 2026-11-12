@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const SCRIPT_CLOSE = /<\/(script)/gi;
 const HTML_COMMENT_OPEN = /<!--/g;
@@ -67,6 +68,21 @@ export function generate(root) {
       `warning: ${escapes} inline-script escape(s) applied in node_modules/echarts/dist/echarts.min.js; review manually`,
     );
   }
+  const client = ts.transpileModule(
+    readFileSync(join(root, 'src/web/gas-charts.client.ts'), 'utf8'),
+    {
+      compilerOptions: {
+        target: ts.ScriptTarget.ES2020,
+        module: ts.ModuleKind.None,
+      },
+    },
+  ).outputText;
+  const clientEscapes = countInlineScriptEscapes(client);
+  if (clientEscapes > 0) {
+    console.error(
+      `warning: ${clientEscapes} inline-script escape(s) applied in src/web/gas-charts.client.ts; review manually`,
+    );
+  }
   return [
     {
       path: join(root, 'src/generated/gas-charts.echarts.ts'),
@@ -76,6 +92,13 @@ export function generate(root) {
           _GAS_CHARTS_ECHARTS_JS: escapeInlineScript(js),
           GAS_CHARTS_ECHARTS_VERSION: version,
         },
+      }),
+    },
+    {
+      path: join(root, 'src/generated/gas-charts.client.ts'),
+      content: toModule({
+        source: 'scripts/generate.js from src/web/gas-charts.client.ts',
+        declarations: { _GAS_CHARTS_CLIENT_JS: escapeInlineScript(client) },
       }),
     },
   ];

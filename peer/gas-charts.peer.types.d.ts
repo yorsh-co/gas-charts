@@ -14,7 +14,7 @@
  * @version 0.0.0
  */
 
-/** Options for `GasCharts.scriptTag` and `GasCharts.inject`. */
+/** Options for `GasCharts.script`, `GasCharts.scriptTag` and `GasCharts.inject`. */
 interface GasChartsScriptOptions {
   /**
    * Value of the `nonce` attribute set on the `<script>` tag, for pages that
@@ -22,6 +22,12 @@ interface GasChartsScriptOptions {
    * characters.
    */
   nonce?: string;
+
+  /**
+   * Appends the browser helper `window.GasCharts` after ECharts. Defaults to
+   * `true`; set to `false` to ship ECharts alone.
+   */
+  client?: boolean;
 }
 
 /**
@@ -37,17 +43,21 @@ declare const GasCharts: {
   readonly ECHARTS_VERSION: string;
 
   /**
-   * Returns the ECharts source, safe to place inside an inline `<script>`.
-   * @returns JavaScript source that defines the global `echarts`.
+   * Returns the ECharts source followed by the browser helper, safe to place
+   * inside an inline `<script>`.
+   * @param options Optional settings; `client: false` omits the helper.
+   * @throws {TypeError} If `options.client` is not a boolean.
+   * @returns JavaScript source that defines the global `echarts` and, unless
+   *   disabled, `window.GasCharts`.
    */
-  script(): string;
+  script(options?: GasChartsScriptOptions): string;
 
   /**
-   * Returns a complete `<script>` element carrying ECharts.
+   * Returns a complete `<script>` element carrying ECharts and the helper.
    * @param options Optional tag settings.
    * @returns The `<script>...</script>` markup.
    * @throws {TypeError} If `options.nonce` is not a string or contains invalid
-   *   characters.
+   *   characters, or `options.client` is not a boolean.
    */
   scriptTag(options?: GasChartsScriptOptions): string;
 
@@ -62,7 +72,8 @@ declare const GasCharts: {
    * @param html The page to inject into.
    * @param options Optional tag settings.
    * @returns The page with ECharts inlined.
-   * @throws {TypeError} If `html` is not a string or `options.nonce` is invalid.
+   * @throws {TypeError} If `html` is not a string or `options.nonce` or
+   *   `options.client` is invalid.
    */
   inject(html: string, options?: GasChartsScriptOptions): string;
 };
