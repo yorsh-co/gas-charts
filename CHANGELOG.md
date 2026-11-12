@@ -6,6 +6,18 @@
 
 ---
 
+## [0.1.1] - 2026-11-12
+
+### Changed
+
+- README restructured to the gas-\* library layout.
+
+### Fixed
+
+- README Quick Start documents the gasdev ^3 bundle config (`outFile`, `libraries` map).
+
+---
+
 ## [0.1.0] - 2026-11-12
 
 ### Added
