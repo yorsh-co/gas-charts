@@ -11,7 +11,7 @@
  * Usage: list `gas-charts` in `gasdev.peers` and run `gasdev peers sync`.
  *
  * @see https://github.com/yorsh-co/gas-charts
- * @version 0.0.0
+ * @version 0.1.0
  */
 
 /** Options for `GasCharts.script`, `GasCharts.scriptTag` and `GasCharts.inject`. */

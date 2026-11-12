@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+---
+
+## [0.1.0] - 2026-11-12
+
 ### Added
 
 - Vendored Apache ECharts 6.1.0 build as an inline-safe generated constant.
