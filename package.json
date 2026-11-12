@@ -20,7 +20,8 @@
   "prettier": "gasdev/prettier",
   "gasdev": {
     "loadOrder": [
-      "gas-charts.constants.ts"
+      "gas-charts.constants.ts",
+      "generated/gas-charts.echarts.ts"
     ],
     "release": {
       "githubRelease": true
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/google-apps-script": "^2.0.13",
     "@types/node": "^22.20.5",
+    "echarts": "6.1.0",
     "eslint": "^10.7.0",
     "gasdev": "github:yorsh-co/gasdev#semver:^3.0.0",
     "prettier": "^3.9.6",
@@ -38,6 +40,8 @@
   },
   "scripts": {
     "clean": "rimraf dist",
+    "generate": "node scripts/generate.js",
+    "generate:check": "node scripts/generate.js --check",
     "release": "gasdev release",
     "build:format": "npm run check && npm run build && npm run format:dist",
     "build:release": "npm run build:format && npm run release",
@@ -49,9 +53,9 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && gasdev check",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "npm run clean && tsc",
+    "build": "npm run clean && npm run generate && tsc",
     "build:watch": "tsc --watch",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json && echo '✓ TypeScript passed'"
+    "typecheck": "npm run generate:check && tsc --noEmit && tsc -p tsconfig.test.json && echo '✓ TypeScript passed'"
   },
   "overrides": {
     "minimatch": "^11.0.1",

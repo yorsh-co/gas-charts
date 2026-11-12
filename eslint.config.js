@@ -1,3 +1,3 @@
 import { gasEslint } from 'gasdev/eslint';
 
-export default gasEslint();
+export default gasEslint({ ignores: ['src/generated/**'] });

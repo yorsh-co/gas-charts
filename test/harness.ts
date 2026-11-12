@@ -5,13 +5,20 @@ import { createGasLoader, loadOrderFiles } from 'gasdev/test';
 export interface GasChartsExports {
   GAS_CHARTS_ERROR_PREFIX: string;
   GAS_CHARTS_MARKER: string;
+  _GAS_CHARTS_ECHARTS_JS: string;
+  GAS_CHARTS_ECHARTS_VERSION: string;
 }
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 const load = createGasLoader<GasChartsExports>({
   files: loadOrderFiles(ROOT),
-  exports: ['GAS_CHARTS_ERROR_PREFIX', 'GAS_CHARTS_MARKER'],
+  exports: [
+    'GAS_CHARTS_ERROR_PREFIX',
+    'GAS_CHARTS_MARKER',
+    '_GAS_CHARTS_ECHARTS_JS',
+    'GAS_CHARTS_ECHARTS_VERSION',
+  ],
   root: ROOT,
 });
 
